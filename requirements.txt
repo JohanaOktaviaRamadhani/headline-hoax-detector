@@ -1,0 +1,8 @@
+#stance processsing
+pandas
+seaborn
+matplotlib
+scikit-learn
+PySastrawi
+#hoax processing
+#streamlit

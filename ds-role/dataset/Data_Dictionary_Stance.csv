@@ -1,0 +1,16 @@
+Nama Kolom,Tipe Data,Deskripsi,Kategori
+no,Integer,Nomor urut data.,Raw Data
+_id,String/Object,ID unik dokumen (MongoDB ObjectId).,Raw Data
+topic,String,"Topik atau tokoh yang dibahas (contoh: ahok, jokowi).",Raw Data
+title,String,Judul artikel berita.,Raw Data
+content,List of Strings,Isi artikel berita dalam bentuk list kalimat.,Raw Data
+stance,String,"Posisi opini (asli: for, against, unknown; diproses menjadi Mendukung/Membantah).",Raw Data
+source,String,URL sumber berita.,Raw Data
+nnps,List of Strings,Entitas atau kata benda spesifik (Named Entities).,Raw Data
+text,String,Gabungan dari title dan content.,Preprocessing
+clean_text,String,"Teks setelah proses cleansing, stopword removal, dan stemming.",Preprocessing
+label,Integer,"Representasi numerik dari stance (0: Membantah, 1: Mendukung).",Preprocessing
+text_length,Integer,Jumlah kata dalam clean_text.,Feature Engineering
+pos_count,Integer,Jumlah kata positif yang ditemukan berdasarkan kamus.,Feature Engineering
+neg_count,Integer,Jumlah kata negatif yang ditemukan berdasarkan kamus.,Feature Engineering
+sentiment_score,Integer,Skor sentimen (pos_count - neg_count).,Feature Engineering
