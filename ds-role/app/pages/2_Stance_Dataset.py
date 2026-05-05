@@ -4,41 +4,56 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from collections import Counter
 import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+# PATH SETUP (robust)
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+APP  = os.path.join(ROOT, "app")
+DATA = os.path.join(ROOT, "dataset")
+
+sys.path.append(APP)
+
 from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH
 
 st.set_page_config(page_title="Stance Dataset · Hoax Detector", page_icon="🗣️", layout="wide")
 st.markdown(SHARED_CSS, unsafe_allow_html=True)
 
-# LOAD DATA
-BASE = os.path.dirname(os.path.dirname(__file__))
-
+# LOADERS
 @st.cache_data
 def load_data():
-    df = pd.read_csv(os.path.join(BASE, "C:\\Users\\hanao\\Downloads\\hoax-detector\\ds-role\\dataset\\final\\final_data_stance.csv"))
-    df["stance"] = df["label"].map({1: "Mendukung", 0: "Membantah"})
-    df["text_length"] = df["clean_text"].apply(lambda x: len(str(x).split()))
+    path = os.path.join(DATA, "final", "final_data_stance.csv")
+    df = pd.read_csv(path)
+
+    if "stance" not in df.columns:
+        df["stance"] = df["label"].map({1: "Mendukung", 0: "Membantah"})
+
+    if "text_length" not in df.columns:
+        df["text_length"] = df["clean_text"].apply(lambda x: len(str(x).split()))
+
     return df
 
+
 @st.cache_data
-def load_words(fname):
-    path = os.path.join(BASE, fname)
+def load_words(filename):
+    path = os.path.join(DATA, "raw", filename)
     try:
-        return [w.strip() for w in open(path, encoding="utf-8").read().splitlines() if w.strip()]
-    except:
+        with open(path, encoding="utf-8") as f:
+            return [w.strip() for w in f.readlines() if w.strip()]
+    except FileNotFoundError:
         return []
 
-df         = load_data()
-pos_words  = load_words("C:\\Users\\hanao\\Downloads\\hoax-detector\\ds-role\\dataset\\raw\\positif-indonesia.txt")
-neg_words  = load_words("C:\\Users\\hanao\\Downloads\\hoax-detector\\ds-role\\dataset\\raw\\negatif-indonesia.txt")
-stop_words = load_words("C:\\Users\\hanao\\Downloads\\hoax-detector\\ds-role\\dataset\\raw\\stopwords_id.txt")
+
+# LOAD DATA
+df = load_data()
+
+pos_words  = load_words("positif-indonesia.txt")
+neg_words  = load_words("negatif-indonesia.txt")
+stop_words = load_words("stopwords_id.txt")
 
 # HEADER
 st.markdown("## 🗣️ Stance Dataset")
 st.markdown(
     "<div class='info-box'>"
-    "Analisis lengkap dataset stance dari <b>Kompasiana</b> — mencakup informasi dataset, "
-    "kamus kata, proses preprocessing, feature engineering, EDA, dan data dictionary."
+    "Analisis dataset stance dari Kompasiana — end-to-end pipeline NLP + insight eksploratif."
     "</div>",
     unsafe_allow_html=True,
 )
@@ -52,7 +67,6 @@ tab_info, tab_kamus, tab_prep, tab_feat, tab_eda, tab_dict = st.tabs([
     "📈 EDA",
     "📚 Data Dictionary",
 ])
-
 
 # TAB 1 — INFO DATASET
 with tab_info:
