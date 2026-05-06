@@ -11,7 +11,6 @@ APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
 sys.path.append(APP)
-
 from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH
 
 st.set_page_config(page_title="Stance Dataset · Hoax Detector", page_icon="🗣️", layout="wide")
@@ -22,15 +21,11 @@ st.markdown(SHARED_CSS, unsafe_allow_html=True)
 def load_data():
     path = os.path.join(DATA, "final", "final_data_stance.csv")
     df = pd.read_csv(path)
-
     if "stance" not in df.columns:
         df["stance"] = df["label"].map({1: "Mendukung", 0: "Membantah"})
-
     if "text_length" not in df.columns:
         df["text_length"] = df["clean_text"].apply(lambda x: len(str(x).split()))
-
     return df
-
 
 @st.cache_data
 def load_words(filename):
@@ -44,19 +39,19 @@ def load_words(filename):
 
 # LOAD DATA
 df = load_data()
-
 pos_words  = load_words("positif-indonesia.txt")
 neg_words  = load_words("negatif-indonesia.txt")
 stop_words = load_words("stopwords_id.txt")
 
 # HEADER
-st.markdown("## 🗣️ Stance Dataset")
-st.markdown(
-    "<div class='info-box'>"
-    "Analisis dataset stance dari Kompasiana — end-to-end pipeline NLP + insight eksploratif."
-    "</div>",
-    unsafe_allow_html=True,
-)
+st.title("🗣️ Stance Dataset")
+st.markdown("""
+Dataset stance ini berasal dari platform Kompasiana dan digunakan untuk menganalisis 
+posisi opini suatu artikel terhadap suatu topik.
+Analisis dilakukan melalui pipeline NLP secara end-to-end, mulai dari data preprocessing, 
+feature engineering, hingga eksplorasi pola teks untuk menghasilkan insight yang relevan 
+terhadap perbedaan stance (mendukung vs membantah).
+""")
 
 # TABS 
 tab_info, tab_kamus, tab_prep, tab_feat, tab_eda, tab_dict = st.tabs([
@@ -70,76 +65,130 @@ tab_info, tab_kamus, tab_prep, tab_feat, tab_eda, tab_dict = st.tabs([
 
 # TAB 1 — INFO DATASET
 with tab_info:
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("📁 Nama File", "dataset_stance_final.csv")
-    c2.metric("🌐 Sumber", "Kompasiana")
-    c3.metric("📝 Raw Awal", "402 baris")
-    c4.metric("✅ Total Final", "300 baris")
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown("""
+        **📁 Nama File**  
+        dataset_stance_final.csv  
 
-    c5, c6, c7 = st.columns(3)
-    c5.metric("🗑️ Dibuang (unknown)", "102 baris (25.4%)")
-    c6.metric("📊 Jumlah Kolom", "8 kolom")
-    c7.metric("🏷️ Kelas", "Mendukung & Membantah")
+        **📊 Jumlah Kolom**  
+        8 kolom  
+        """)
 
+    with col2:
+        st.markdown("""
+        **📝 Raw Awal**  
+        402 baris  
+
+        **✅ Total Final**  
+        300 baris  
+        """)
+
+    with col3:
+        st.markdown("""
+        **🗑️ Dibuang (unknown)**  
+        102 baris (25.4%)   
+
+        **🏷️ Kelas**  
+        Mendukung & Membantah  
+        """)
     st.markdown("<br>", unsafe_allow_html=True)
 
+    # ── TOP: CHART + SUMMARY ──
     col_left, col_right = st.columns([1, 1], gap="large")
-
     with col_left:
-        st.markdown("<div class='section-title'>Distribusi Stance</div>", unsafe_allow_html=True)
+        st.markdown("**Distribusi Stance**")
+
         mendukung = len(df[df["stance"] == "Mendukung"])
         membantah = len(df[df["stance"] == "Membantah"])
         total = len(df)
-        fig, ax = plt.subplots(figsize=(4, 4))
-        sizes  = [mendukung, membantah]
+
+        sizes = [mendukung, membantah]
         colors = [COLOR_MENDUKUNG, COLOR_MEMBANTAH]
-        labels = [f"Mendukung\n{mendukung} ({mendukung/total*100:.1f}%)",
-                  f"Membantah\n{membantah} ({membantah/total*100:.1f}%)"]
-        wedges, _ = ax.pie(sizes, colors=colors, startangle=90,
-                           wedgeprops=dict(width=0.55, edgecolor="white", linewidth=2))
-        ax.text(0, 0, f"{total}\ndata", ha="center", va="center",
-                fontsize=13, fontweight="bold", color="#1F2937")
-        ax.legend(wedges, labels, loc="lower center", bbox_to_anchor=(0.5, -0.15),
-                  ncol=2, frameon=False, fontsize=9)
-        ax.set_title("Distribusi Stance", fontsize=12, fontweight="bold", pad=10)
+
+        fig, ax = plt.subplots(figsize=(3, 3))  
+        wedges, _ = ax.pie(
+            sizes,
+            colors=colors,
+            startangle=90,
+            radius=0.85,
+            wedgeprops=dict(width=0.35, edgecolor="white")
+        )
+        ax.text(
+            0, 0,
+            f"{total}",
+            ha="center",
+            va="center",
+            fontsize=12,
+            fontweight="bold"
+        )
+
+        ax.legend(
+            wedges,
+            [
+                f"Mendukung ({mendukung})",
+                f"Membantah ({membantah})"
+            ],
+            loc="center left",
+            bbox_to_anchor=(1, 0.5),
+            frameon=False,
+            fontsize=9
+        )
+        ax.set(aspect="equal")
         fig.patch.set_facecolor("none")
-        st.pyplot(fig, use_container_width=True)
+        st.pyplot(fig, use_container_width=False) 
         plt.close()
 
+
     with col_right:
-        st.markdown("<div class='section-title'>Ringkasan Statistik</div>", unsafe_allow_html=True)
+        st.markdown("**Ringkasan Statistik**")
+
         st.markdown(f"""
-        <div style='margin-top:12px'>
-        <div class='dict-row'><span class='dict-col'>Data akhir</span><span class='dict-desc'><b>300 baris</b></span></div>
-        <div class='dict-row'><span class='dict-col'>Mendukung</span><span class='dict-desc'><b style='color:{COLOR_MENDUKUNG}'>{mendukung} ({mendukung/total*100:.1f}%)</b></span></div>
-        <div class='dict-row'><span class='dict-col'>Membantah</span><span class='dict-desc'><b style='color:{COLOR_MEMBANTAH}'>{membantah} ({membantah/total*100:.1f}%)</b></span></div>
-        <div class='dict-row'><span class='dict-col'>Rata-rata kata</span><span class='dict-desc'><b>{df['text_length'].mean():.0f} kata / dokumen</b></span></div>
-        <div class='dict-row'><span class='dict-col'>Median kata</span><span class='dict-desc'><b>{df['text_length'].median():.0f} kata</b></span></div>
-        <div class='dict-row'><span class='dict-col'>Rata-rata pos_count</span><span class='dict-desc'><b>{df['pos_count'].mean():.1f} kata positif</b></span></div>
-        <div class='dict-row'><span class='dict-col'>Rata-rata neg_count</span><span class='dict-desc'><b>{df['neg_count'].mean():.1f} kata negatif</b></span></div>
-        </div>
-        """, unsafe_allow_html=True)
+        - **Total data**: {total} baris  
+        - **Mendukung**: {mendukung} ({mendukung/total*100:.1f}%)  
+        - **Membantah**: {membantah} ({membantah/total*100:.1f}%)  
+        - **Rata-rata kata**: {df['text_length'].mean():.0f} kata  
+        - **Median kata**: {df['text_length'].median():.0f} kata  
+        - **Rata-rata kata positif**: {df['pos_count'].mean():.1f}  
+        - **Rata-rata kata negatif**: {df['neg_count'].mean():.1f}  
+        """)
 
-        st.markdown("<br><div class='section-title'>Preview Data</div>", unsafe_allow_html=True)
-        preview = df[["clean_text","stance","text_length","pos_count","neg_count","sentiment_score"]].head(5).copy()
-        preview["clean_text"] = preview["clean_text"].apply(lambda x: x[:55]+"..." if len(x)>55 else x)
-        st.dataframe(preview, use_container_width=True, hide_index=True)
+    # ── BOTTOM: FULL WIDTH PREVIEW ──
+    st.markdown("**Preview Data Final**")
 
+    preview = df[[
+        "clean_text", "stance",
+        "text_length", "pos_count",
+        "neg_count", "sentiment_score"
+    ]].head(5).copy()
+
+    preview["clean_text"] = preview["clean_text"].apply(
+        lambda x: x[:55] + "..." if len(x) > 55 else x
+    )
+
+    st.dataframe(preview, use_container_width=True, hide_index=True)
 
 # TAB 2 — KAMUS KATA
 with tab_kamus:
-    st.markdown(
-        "<div class='info-box'>Tiga kamus kata yang digunakan dalam preprocessing dan feature engineering.</div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("### Kamus Kata")
+    st.markdown("""
+    Tiga kamus kata digunakan dalam proses preprocessing dan feature engineering
+    untuk menganalisis karakteristik teks secara lebih terstruktur.
+    Kamus positif dan negatif digunakan untuk mengidentifikasi kecenderungan sentimen 
+    dalam teks, sedangkan stopword digunakan untuk menghapus kata-kata umum yang tidak 
+    memiliki makna signifikan dalam analisis.
+    Penggunaan kamus ini membantu meningkatkan kualitas representasi teks serta 
+    mendukung pembentukan fitur seperti pos_count, neg_count, dan sentiment_score.
+    """)
+    
     t1, t2, t3 = st.tabs([
-        f"✅ Positif ({len(pos_words)} kata)",
-        f"❌ Negatif ({len(neg_words)} kata)",
-        f"🚫 Stopword ({len(stop_words)} kata)",
+        f"Positif ({len(pos_words)} kata)",
+        f"Negatif ({len(neg_words)} kata)",
+        f"Stopword ({len(stop_words)} kata)",
     ])
 
     def word_tab(words, badge_cls, key):
-        q = st.text_input("🔍 Cari kata...", key=key, placeholder="ketik kata...")
+        q = st.text_input("🔍 Cari kata...", key=key, placeholder="Masukkan kata yang ingin kamu cari...")
         filtered = [w for w in words if q.lower() in w.lower()] if q else words
         st.markdown(f"<small style='color:#6B7280'>Menampilkan {min(len(filtered),200)} dari {len(words)} kata</small>",
                     unsafe_allow_html=True)
@@ -149,7 +198,6 @@ with tab_kamus:
     with t1: word_tab(pos_words,  "badge-green", "kp")
     with t2: word_tab(neg_words,  "badge-red",   "kn")
     with t3: word_tab(stop_words, "badge-gray",  "ks")
-
 
 # TAB 3 — PREPROCESSING
 with tab_prep:
@@ -221,7 +269,6 @@ with tab_feat:
     fig.patch.set_facecolor("none")
     st.pyplot(fig, use_container_width=True)
     plt.close()
-
 
 # TAB 5 — EDA
 with tab_eda:
@@ -374,40 +421,27 @@ with tab_eda:
         Fitur ini bersifat suplementatif.
         </div>""", unsafe_allow_html=True)
 
-
 # TAB 6 — DATA DICTIONARY
 with tab_dict:
-    st.markdown(
-        "<div class='info-box'>Penjelasan lengkap setiap kolom pada dataset final yang digunakan untuk pemodelan.</div>",
-        unsafe_allow_html=True,
-    )
-    columns = [
-        ("title",          "str", "Judul artikel berita dari Kompasiana.",                    "—"),
-        ("content",        "str", "Isi artikel berita (konten utama).",                       "—"),
-        ("text",           "str", "Gabungan title + content sebagai input teks awal.",        "—"),
-        ("clean_text",     "str", "Teks setelah seluruh tahap preprocessing.",                "—"),
-        ("stance",         "str", "Label kategori sikap artikel.",                            "Mendukung / Membantah"),
-        ("label",          "int", "Encoding numerik dari kolom stance.",                      "1 = Mendukung · 0 = Membantah"),
-        ("text_length",    "int", "Jumlah kata dalam clean_text.",                            f"Range: {df['text_length'].min()}–{df['text_length'].max()}"),
-        ("pos_count",      "int", "Jumlah kata positif ditemukan dalam clean_text.",          f"Range: {df['pos_count'].min()}–{df['pos_count'].max()}"),
-        ("neg_count",      "int", "Jumlah kata negatif ditemukan dalam clean_text.",          f"Range: {df['neg_count'].min()}–{df['neg_count'].max()}"),
-        ("sentiment_score","int", "Selisih pos_count − neg_count.",                           f"Range: {df['sentiment_score'].min()}–{df['sentiment_score'].max()}"),
-    ]
-    for cname, ctype, cdesc, cextra in columns:
-        st.markdown(f"""
-        <div class='step-card'>
-            <div style='width:100%'>
-                <div style='display:flex;align-items:center;gap:8px;margin-bottom:4px'>
-                    <span style='font-family:monospace;font-weight:700;color:#4F46E5;font-size:0.95rem'>{cname}</span>
-                    <span class='badge badge-blue'>{ctype}</span>
-                </div>
-                <div style='color:#374151;font-size:0.88rem;margin-bottom:2px'>{cdesc}</div>
-                <div style='color:#9CA3AF;font-size:0.80rem'>📌 {cextra}</div>
-            </div>
-        </div>""", unsafe_allow_html=True)
+    st.markdown("### Data Dictionary")
+    st.markdown("""
+    Data dictionary adalah dokumentasi yang menjelaskan setiap kolom dalam dataset, 
+    termasuk tipe data, deskripsi, dan perannya dalam pipeline data.
+    Dokumentasi ini membantu memahami struktur data dari tahap raw data, 
+    preprocessing, hingga feature engineering, sehingga memudahkan analisis 
+    dan pengembangan model selanjutnya.
+    """)
 
-    st.markdown("<br><div class='section-title'>Statistik Deskriptif</div>", unsafe_allow_html=True)
-    st.dataframe(
-        df[["text_length","pos_count","neg_count","sentiment_score","label"]].describe().round(2),
-        use_container_width=True,
-    )
+    ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    path = os.path.join(ROOT, "dataset", "Data_Dictionary_Stance.csv")
+
+    @st.cache_data
+    def load_dict(p):
+        return pd.read_csv(p)
+
+    try:
+        df_dict = load_dict(path)
+        st.dataframe(df_dict, use_container_width=True, hide_index=True)
+    except FileNotFoundError:
+        st.error("❌ File Data_Dictionary_Stance.csv tidak ditemukan di folder dataset.")
+        st.write("Path yang dicoba:", path)

@@ -1,21 +1,37 @@
 import streamlit as st
+import os, sys
+
+# PATH SETUP
+BASE_DIR = os.path.dirname(__file__)
+sys.path.append(BASE_DIR)
+
+from utils import SHARED_CSS
 
 st.set_page_config(
     page_title="Hoax Detector Dashboard",
-    page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="expanded",
+    page_icon="📊",
+    layout="wide"
 )
 
-st.markdown("""
-<style>
-html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-.main { background-color: #FAFAFA; }
-section[data-testid="stSidebar"] {
-    background-color: #FFFFFF;
-    border-right: 1px solid #E5E7EB;
-}
-</style>
-""", unsafe_allow_html=True)
+st.markdown(SHARED_CSS, unsafe_allow_html=True)
 
-st.switch_page("C:\\Users\\hanao\\Downloads\\hoax-detector\\ds-role\\app\\pages\\1_Overview.py")
+# HEADER
+st.title("📊 Hoax Detector Dashboard")
+st.markdown("Overview seluruh dataset dan insight utama.")
+
+# QUICK NAV
+st.markdown("### 🚀 Quick Navigation")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.page_link("pages/1_Stance_Dataset.py", label="🗣️ Stance Dataset")
+
+with col2:
+    st.page_link("pages/2_Hoax_Fact_Clickbait.py", label="📰 Hoax / Fact / Clickbait")
+
+with col3:
+    st.page_link("pages/3_Pers_Dataset.py", label="🏛️ Pers Dataset")
+
+st.markdown("---")
+
+st.info("Gunakan menu di sidebar atau quick navigation untuk eksplor dataset.")
