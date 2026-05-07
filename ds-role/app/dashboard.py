@@ -27,7 +27,7 @@ with col1:
     st.page_link("pages/1_Stance_Dataset.py", label="🗣️ Stance Dataset")
 
 with col2:
-    st.page_link("pages/2_Hoax_Fact_Clickbait.py", label="📰 Hoax / Fact / Clickbait")
+    st.page_link("pages/2_Hoax_Fact_Clickbait_Dataset.py", label="📰 Hoax / Fact / Clickbait")
 
 with col3:
     st.page_link("pages/3_Pers_Dataset.py", label="🏛️ Pers Dataset")
