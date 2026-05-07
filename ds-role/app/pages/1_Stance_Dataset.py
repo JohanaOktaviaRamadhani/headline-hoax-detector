@@ -65,6 +65,14 @@ tab_info, tab_kamus, tab_prep, tab_feat, tab_eda, tab_dict = st.tabs([
 
 # TAB 1 — INFO DATASET
 with tab_info:
+    st.markdown("### Informasi Dataset")
+    st.markdown("""
+    Dataset ini merupakan hasil akhir dari pipeline preprocessing yang telah melalui proses 
+    filtering dan pembersihan data untuk memastikan kualitas dan konsistensi. 
+    Ringkasan berikut menampilkan ukuran dataset, perubahan jumlah data setelah cleaning, 
+    serta komposisi label yang menjadi dasar dalam analisis stance.
+    """)
+
     col1, col2, col3 = st.columns(3)
     with col1:
         st.markdown("""
@@ -122,7 +130,6 @@ with tab_info:
             fontsize=12,
             fontweight="bold"
         )
-
         ax.legend(
             wedges,
             [
@@ -139,10 +146,8 @@ with tab_info:
         st.pyplot(fig, use_container_width=False) 
         plt.close()
 
-
     with col_right:
         st.markdown("**Ringkasan Statistik**")
-
         st.markdown(f"""
         - **Total data**: {total} baris  
         - **Mendukung**: {mendukung} ({mendukung/total*100:.1f}%)  
@@ -153,7 +158,7 @@ with tab_info:
         - **Rata-rata kata negatif**: {df['neg_count'].mean():.1f}  
         """)
 
-    # ── BOTTOM: FULL WIDTH PREVIEW ──
+    # ── PREVIEW DATA FINAL ──
     st.markdown("**Preview Data Final**")
 
     preview = df[[
@@ -201,225 +206,270 @@ with tab_kamus:
 
 # TAB 3 — PREPROCESSING
 with tab_prep:
-    st.markdown(
-        "<div class='info-box'>Pipeline preprocessing teks secara <b>end-to-end</b> dari data mentah hingga teks bersih siap dimodelkan.</div>",
-        unsafe_allow_html=True,
-    )
+    st.markdown("### Pipeline Preprocessing Teks")
+    st.markdown("""
+    Pipeline preprocessing dilakukan secara end-to-end untuk mentransformasi data mentah 
+    menjadi teks bersih yang siap digunakan dalam proses analisis dan pemodelan. 
+    Setiap tahapan dirancang untuk memastikan kualitas data tetap terjaga serta 
+    memaksimalkan informasi yang dapat diekstraksi dari teks.
+    """)
+
+    def render_chips(items, color="#F3F4F6", text_color="#111827"):
+        return " ".join([
+            f"<span style='background:{color};color:{text_color};padding:4px 8px;border-radius:6px;margin:2px;display:inline-block;font-size:0.8rem'>{item}</span>"
+            for item in items
+        ])
+
+    # pipeline steps
     steps = [
-        ("Gathering Data",              "Mengumpulkan 402 artikel dari Kompasiana."),
-        ("Assessing Data",              "Cek duplikat, missing value, dan distribusi label."),
-        ("Drop Kolom Tidak Relevan",    "Hapus kolom <code>no</code>, <code>_id</code>, <code>topic</code>, <code>nnps</code>."),
-        ("Gabungkan Title + Content",   "Kolom <code>title + content</code> → kolom <code>text</code>."),
-        ("Hapus Label Unknown",         "Hapus 102 baris unknown → tersisa <b>300 baris</b>."),
-        ("Mapping Label",               "<code>for</code> → <b>Mendukung</b> · <code>against</code> → <b>Membantah</b>."),
-        ("Cleaning Teks",               "Lowercase, hapus URL, mention, hashtag, angka, simbol, normalisasi spasi."),
-        ("Formalisasi Slang",           "10 kata slang: <code>yg→yang</code>, <code>tdk→tidak</code>, <code>dgn→dengan</code>, <code>hoax→hoaks</code>, <code>bkn→bukan</code>, <code>tp→tapi</code>, <code>klo→kalau</code>, <code>ga/gak→tidak</code>, <code>udah→sudah</code>."),
-        ("Hapus Stopword",              "Sastrawi + custom stopword — dengan proteksi kata negasi & sentimen penting."),
-        ("Stemming",                    "Ubah ke bentuk dasar menggunakan <b>Sastrawi Stemmer</b>."),
+        ("Gathering Data",
+         "Mengumpulkan 402 artikel dari Kompasiana."),
+        ("Assessing Data",
+         "Cek duplikat, missing value, dan distribusi label."),
+        ("Drop Kolom Tidak Relevan",
+         render_chips(["no", "_id", "topic", "nnps"])),
+        ("Gabungkan Title + Content",
+         render_chips(["title", "+", "content", "→", "text"], "#E0F2FE", "#0369A1")),
+        ("Hapus Label Unknown",
+         "Hapus 102 baris unknown → tersisa <b>300 baris</b>."),
+        ("Mapping Label",
+         render_chips(["for → Mendukung", "against → Membantah"], "#FEF3C7", "#92400E")),
+        ("Cleaning Teks",
+         "Lowercase, hapus URL, mention, hashtag, angka, simbol, dan normalisasi spasi."),
+        ("Formalisasi Slang",
+         render_chips([
+             "yg→yang","tdk→tidak","dgn→dengan","hoax→hoaks",
+             "bkn→bukan","tp→tapi","klo→kalau","ga/gak→tidak","udah→sudah"
+         ], "#ECFDF5", "#065F46")),
+        ("Hapus Stopword",
+         "Sastrawi + custom stopword dengan proteksi kata negasi & sentimen penting."),
+        ("Stemming",
+         "Mengubah kata ke bentuk dasar menggunakan <b>Sastrawi Stemmer</b>."),
     ]
+
+    #  render step cards
     for i, (title, desc) in enumerate(steps, 1):
         st.markdown(f"""
         <div class='step-card'>
             <div class='step-num'>{i}</div>
             <div>
-                <div style='font-weight:600;color:#111827;margin-bottom:3px'>{title}</div>
-                <div style='color:#6B7280;font-size:0.88rem'>{desc}</div>
+                <div style='font-weight:600;color:#111827;margin-bottom:4px'>{title}</div>
+                <div style='color:#6B7280;font-size:0.9rem'>{desc}</div>
             </div>
-        </div>""", unsafe_allow_html=True)
-
-    st.markdown("<br><div class='section-title'>Slang Dictionary</div>", unsafe_allow_html=True)
-    slang = {"yg":"yang","tdk":"tidak","dgn":"dengan","hoax":"hoaks",
-             "bkn":"bukan","tp":"tapi","klo":"kalau","ga":"tidak","gak":"tidak","udah":"sudah"}
-    st.dataframe(pd.DataFrame(list(slang.items()), columns=["Slang","Formal"]),
-                 use_container_width=True, hide_index=True)
-
+        </div>
+        """, unsafe_allow_html=True)
 
 # TAB 4 — FEATURE ENGINEERING
 with tab_feat:
-    st.markdown(
-        "<div class='info-box'>Fitur numerik diturunkan dari teks bersih untuk memperkaya representasi data.</div>",
-        unsafe_allow_html=True,
-    )
-    features = [
-        ("text_length",     "int", "Jumlah kata dalam <code>clean_text</code>.",                       f"Min {df['text_length'].min()} · Max {df['text_length'].max()} · Mean {df['text_length'].mean():.1f}"),
-        ("pos_count",       "int", "Jumlah kata yang cocok dengan kamus kata positif.",                f"Min {df['pos_count'].min()} · Max {df['pos_count'].max()} · Mean {df['pos_count'].mean():.1f}"),
-        ("neg_count",       "int", "Jumlah kata yang cocok dengan kamus kata negatif.",                f"Min {df['neg_count'].min()} · Max {df['neg_count'].max()} · Mean {df['neg_count'].mean():.1f}"),
-        ("sentiment_score", "int", "Selisih <code>pos_count − neg_count</code>.",                     f"Min {df['sentiment_score'].min()} · Max {df['sentiment_score'].max()} · Mean {df['sentiment_score'].mean():.1f}"),
-        ("label",          "int",  "Encoding numerik stance via <b>LabelEncoder</b>.",                "0 = Membantah · 1 = Mendukung"),
-    ]
-    for fname, ftype, fdesc, fstat in features:
-        st.markdown(f"""
-        <div class='step-card'>
-            <div>
-                <div style='display:flex;align-items:center;gap:8px;margin-bottom:4px'>
-                    <span style='font-family:monospace;font-weight:700;color:#4F46E5;font-size:0.95rem'>{fname}</span>
-                    <span class='badge badge-blue'>{ftype}</span>
-                </div>
-                <div style='color:#374151;font-size:0.88rem;margin-bottom:3px'>{fdesc}</div>
-                <div style='color:#9CA3AF;font-size:0.82rem'>📊 {fstat}</div>
-            </div>
-        </div>""", unsafe_allow_html=True)
+    st.markdown("### Feature Engineering")
+    st.markdown("""
+    Feature engineering dilakukan untuk mentransformasikan teks bersih menjadi 
+    fitur numerik yang dapat diproses oleh model machine learning. 
+    Fitur yang dihasilkan mencerminkan karakteristik struktural dan sentimen teks, 
+    seperti panjang dokumen, intensitas kata positif dan negatif, serta skor sentimen. 
+    Representasi ini membantu model dalam menangkap pola yang relevan untuk 
+    membedakan stance secara lebih akurat.
+    """)
 
-    st.markdown("<br><div class='section-title'>Correlation Heatmap</div>", unsafe_allow_html=True)
-    corr = df[["pos_count","neg_count","sentiment_score","label","text_length"]].corr()
-    fig, ax = plt.subplots(figsize=(6, 4))
-    sns.heatmap(corr, annot=True, fmt=".2f", cmap="RdYlGn", center=0,
-                linewidths=0.5, linecolor="#E5E7EB", ax=ax, annot_kws={"size": 9})
-    ax.set_title("Correlation Heatmap — Fitur Numerik", fontsize=11, fontweight="bold", pad=10)
-    fig.patch.set_facecolor("none")
-    st.pyplot(fig, use_container_width=True)
-    plt.close()
+    features = [
+        ("text_length",
+        "Jumlah kata dalam teks",
+        f"Teks berkisar dari {df['text_length'].min()} hingga {df['text_length'].max()} kata, dengan rata-rata sekitar {df['text_length'].mean():.0f} kata per dokumen."),
+
+        ("pos_count",
+        "Jumlah kata positif",
+        f"Rata-rata terdapat {df['pos_count'].mean():.0f} kata positif per teks, dengan variasi dari {df['pos_count'].min()} hingga {df['pos_count'].max()} kata."),
+
+        ("neg_count",
+        "Jumlah kata negatif",
+        f"Rata-rata terdapat {df['neg_count'].mean():.0f} kata negatif, dengan rentang {df['neg_count'].min()} sampai {df['neg_count'].max()} kata."),
+
+        ("sentiment_score",
+        "Selisih sentimen (positif − negatif)",
+        f"Skor sentimen berkisar dari {df['sentiment_score'].min()} hingga {df['sentiment_score'].max()}, dengan kecenderungan rata-rata {df['sentiment_score'].mean():.1f}."),
+
+        ("label",
+        "Representasi numerik stance",
+        "0 menunjukkan Membantah, sedangkan 1 menunjukkan Mendukung."),
+    ]
+
+    for name, desc, explain in features:
+        st.markdown(f"""
+        <div style='padding:10px 12px;border:1px solid #E5E7EB;border-radius:10px;margin-bottom:8px'>
+            <div style='font-family:monospace;font-weight:600;color:#4F46E5;margin-bottom:3px'>{name}</div>
+            <div style='font-size:0.85rem;color:#6B7280;margin-bottom:2px'>{desc}</div>
+            <div style='font-size:0.82rem;color:#9CA3AF'>{explain}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # st.markdown("#### Correlation Matrix")
+    # st.markdown("""
+    # Matriks korelasi menunjukkan hubungan antar fitur numerik. 
+    # Nilai mendekati 1 berarti hubungan positif kuat, mendekati -1 berarti negatif kuat, 
+    # dan mendekati 0 berarti tidak ada hubungan linear yang signifikan.
+    # """)
+
+    # cols = ["text_length", "pos_count", "neg_count", "sentiment_score", "label"]
+    # corr = df[cols].corr()
+    # fig, ax = plt.subplots(figsize=(4, 3), dpi=120)  
+    # sns.heatmap(
+    #     corr,
+    #     annot=True,
+    #     fmt=".1f",  
+    #     cmap="coolwarm",
+    #     annot_kws={"size":7},
+    #     cbar=False,
+    #     square=True, 
+    #     ax=ax
+    # )
+    # ax.tick_params(labelsize=7)
+    # plt.tight_layout()  
+    # st.pyplot(fig, use_container_width=False)  
 
 # TAB 5 — EDA
 with tab_eda:
-    eda1, eda2, eda3, eda4 = st.tabs([
-        "📊 Distribusi", "📏 Panjang Teks", "💬 Top Kata", "😊 Sentimen"
-    ])
+    st.markdown("### Exploratory Data Analysis (EDA)")
+    st.markdown("""
+    Secara keseluruhan, dataset menunjukkan bahwa perbedaan stance tidak hanya dipengaruhi 
+    oleh sentimen, tetapi juga oleh struktur teks dan konteks kata. 
+    Hal ini mengindikasikan bahwa pendekatan berbasis fitur sederhana perlu dikombinasikan 
+    dengan representasi teks yang lebih kaya untuk menghasilkan model yang optimal.
+    """)
 
-    # ── EDA 1: Distribusi ──
-    with eda1:
-        c1, c2 = st.columns(2, gap="large")
-        with c1:
-            st.markdown("<div class='section-title'>Bar Chart Distribusi Stance</div>", unsafe_allow_html=True)
-            vc = df["stance"].value_counts()
-            fig, ax = plt.subplots(figsize=(4, 3.5))
-            bars = ax.bar(vc.index, vc.values,
-                          color=[COLOR_MENDUKUNG, COLOR_MEMBANTAH], width=0.5, edgecolor="white")
-            for bar in bars:
-                ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+2,
-                        str(int(bar.get_height())), ha="center", va="bottom",
-                        fontsize=10, fontweight="bold", color="#1F2937")
-            ax.set_ylabel("Jumlah Dokumen", fontsize=9)
-            ax.set_title("Distribusi Stance", fontsize=11, fontweight="bold")
-            ax.spines[["top","right"]].set_visible(False)
-            ax.set_ylim(0, max(vc.values)*1.15)
-            fig.patch.set_facecolor("none")
-            st.pyplot(fig, use_container_width=True); plt.close()
-        with c2:
-            st.markdown("<div class='section-title'>Insight</div>", unsafe_allow_html=True)
-            st.markdown(f"""
-            <div class='info-box'>
-            Kelas <b>Mendukung</b> lebih dominan (<b>177 dokumen, 59%</b>) dibanding
-            <b>Membantah</b> (<b>123 dokumen, 41%</b>).<br><br>
-            Ketidakseimbangan ini masih dalam batas wajar namun perlu diperhatikan
-            agar model tidak bias terhadap kelas mayoritas.
-            </div>
-            <br>
-            """, unsafe_allow_html=True)
-            st.dataframe(
-                pd.DataFrame({"Stance":["Mendukung","Membantah","Total"],
-                              "Jumlah":[177,123,300],
-                              "Persentase":["59.0%","41.0%","100%"]}),
-                use_container_width=True, hide_index=True,
-            )
+    # DISTRIBUSI STANCE
+    st.markdown("### 📊 Distribusi Stance")
+    c1, c2 = st.columns(2, gap="large")
+    with c1:
+        vc = df["stance"].value_counts()
+        fig, ax = plt.subplots(figsize=(4, 3.2))
+        bars = ax.bar(vc.index, vc.values,
+                      color=[COLOR_MENDUKUNG, COLOR_MEMBANTAH],
+                      width=0.5, edgecolor="white")
 
-    # ── EDA 2: Panjang Teks ──
-    with eda2:
-        c1, c2 = st.columns(2, gap="large")
-        with c1:
-            st.markdown("<div class='section-title'>Distribusi Panjang Teks</div>", unsafe_allow_html=True)
-            fig, ax = plt.subplots(figsize=(5, 3.5))
-            ax.hist(df["text_length"], bins=30, color=COLOR_MAIN, alpha=0.75, edgecolor="white")
-            ax.axvline(df["text_length"].mean(), color="#F43F5E", linestyle="--", lw=1.5,
-                       label=f"Mean ({df['text_length'].mean():.0f})")
-            ax.axvline(df["text_length"].median(), color="#10B981", linestyle="--", lw=1.5,
-                       label=f"Median ({df['text_length'].median():.0f})")
-            ax.set_xlabel("Jumlah Kata", fontsize=9); ax.set_ylabel("Frekuensi", fontsize=9)
-            ax.set_title("Distribusi Panjang Teks", fontsize=11, fontweight="bold")
-            ax.legend(fontsize=8); ax.spines[["top","right"]].set_visible(False)
-            fig.patch.set_facecolor("none")
-            st.pyplot(fig, use_container_width=True); plt.close()
+        for bar in bars:
+            ax.text(bar.get_x()+bar.get_width()/2, bar.get_height()+2,
+                    str(int(bar.get_height())), ha="center", va="bottom",
+                    fontsize=9, fontweight="bold")
 
-        with c2:
-            st.markdown("<div class='section-title'>Boxplot per Stance</div>", unsafe_allow_html=True)
-            fig, ax = plt.subplots(figsize=(5, 3.5))
-            data_bp = [df[df["stance"]=="Mendukung"]["text_length"],
-                       df[df["stance"]=="Membantah"]["text_length"]]
-            bp = ax.boxplot(data_bp, patch_artist=True, widths=0.4,
-                            medianprops=dict(color="white", linewidth=2))
-            for patch, c in zip(bp["boxes"], [COLOR_MENDUKUNG, COLOR_MEMBANTAH]):
-                patch.set_facecolor(c); patch.set_alpha(0.7)
-            ax.set_xticklabels(["Mendukung","Membantah"])
-            ax.set_ylabel("Jumlah Kata", fontsize=9)
-            ax.set_title("Panjang Teks per Stance", fontsize=11, fontweight="bold")
-            ax.spines[["top","right"]].set_visible(False)
-            fig.patch.set_facecolor("none")
-            st.pyplot(fig, use_container_width=True); plt.close()
-
-        st.markdown("""
-        <div class='info-box'>
-        Distribusi <b>right-skewed</b> — rata-rata <b>433 kata</b>, median <b>352 kata</b>.
-        Mayoritas dokumen di rentang <b>200–600 kata</b>.
-        Kelas <b>Membantah</b> cenderung sedikit lebih panjang dengan variasi lebih besar.
-        </div>""", unsafe_allow_html=True)
-
-    # ── EDA 3: Top Kata ──
-    with eda3:
-        st.markdown("<div class='section-title'>Top 20 Kata Paling Sering Muncul</div>", unsafe_allow_html=True)
-        all_w = " ".join(df["clean_text"]).split()
-        top20 = Counter(all_w).most_common(20)
-        df_top = pd.DataFrame(top20, columns=["kata","frekuensi"])
-        fig, ax = plt.subplots(figsize=(8, 4.5))
-        colors_bar = [COLOR_MAIN if i < 5 else "#A5B4FC" for i in range(20)]
-        ax.barh(df_top["kata"][::-1], df_top["frekuensi"][::-1],
-                color=colors_bar[::-1], edgecolor="white")
-        ax.set_xlabel("Frekuensi", fontsize=9)
-        ax.set_title("Top 20 Kata Paling Sering Muncul", fontsize=11, fontweight="bold")
+        ax.set_title("Distribusi Stance", fontsize=10, fontweight="bold")
         ax.spines[["top","right"]].set_visible(False)
         fig.patch.set_facecolor("none")
+
         st.pyplot(fig, use_container_width=True); plt.close()
-
-        st.markdown("<br><div class='section-title'>Top 10 Kata per Stance</div>", unsafe_allow_html=True)
-        c1, c2 = st.columns(2, gap="large")
-        for col, stance, color in [(c1,"Mendukung",COLOR_MENDUKUNG),(c2,"Membantah",COLOR_MEMBANTAH)]:
-            with col:
-                w = " ".join(df[df["stance"]==stance]["clean_text"]).split()
-                df_s = pd.DataFrame(Counter(w).most_common(10), columns=["kata","frekuensi"])
-                fig, ax = plt.subplots(figsize=(4.5, 3.5))
-                ax.barh(df_s["kata"][::-1], df_s["frekuensi"][::-1],
-                        color=color, alpha=0.75, edgecolor="white")
-                ax.set_title(f"Top 10 — {stance}", fontsize=10, fontweight="bold")
-                ax.spines[["top","right"]].set_visible(False)
-                fig.patch.set_facecolor("none")
-                st.pyplot(fig, use_container_width=True); plt.close()
-
-        st.markdown("""
+    with c2:
+       st.markdown("""
         <div class='info-box'>
-        Kata <b>"ahok"</b> dominan di kedua kelas. Pada <b>Membantah</b>, kata <b>"yusril"</b>
-        lebih menonjol sebagai perbandingan tokoh. Kata <b>"tidak"</b> & <b>"bukan"</b>
-        hadir di keduanya, menandakan banyak pernyataan kontradiktif.
-        </div>""", unsafe_allow_html=True)
+        Distribusi data menunjukkan bahwa kelas <b>Mendukung</b> (59%) lebih dominan dibanding 
+        <b>Membantah</b> (41%). Meskipun terdapat ketidakseimbangan, selisih ini masih dalam batas 
+        yang relatif moderat sehingga model masih dapat belajar pola dari kedua kelas.
 
-    # ── EDA 4: Sentimen ──
-    with eda4:
-        c1, c2, c3 = st.columns(3, gap="large")
-        for col, feat, label in [
-            (c1, "pos_count",      "Kata Positif"),
-            (c2, "neg_count",      "Kata Negatif"),
-            (c3, "sentiment_score","Sentiment Score"),
-        ]:
-            with col:
-                st.markdown(f"<div class='section-title'>{label}</div>", unsafe_allow_html=True)
-                fig, ax = plt.subplots(figsize=(3.8, 3.2))
-                data_bp = [df[df["stance"]=="Mendukung"][feat],
-                           df[df["stance"]=="Membantah"][feat]]
-                bp = ax.boxplot(data_bp, patch_artist=True, widths=0.4,
-                                medianprops=dict(color="white", linewidth=2))
-                for patch, c in zip(bp["boxes"],[COLOR_MENDUKUNG,COLOR_MEMBANTAH]):
-                    patch.set_facecolor(c); patch.set_alpha(0.7)
-                ax.set_xticklabels(["Mendukung","Membantah"], fontsize=8)
-                ax.set_title(label, fontsize=10, fontweight="bold")
-                ax.spines[["top","right"]].set_visible(False)
-                fig.patch.set_facecolor("none")
-                st.pyplot(fig, use_container_width=True); plt.close()
+        Namun demikian, kondisi ini tetap berpotensi menyebabkan bias ke kelas mayoritas, 
+        terutama pada model yang sensitif terhadap distribusi data. Oleh karena itu, pada tahap 
+        modeling perlu dipertimbangkan strategi seperti penggunaan metrik evaluasi yang tepat 
+        (AUC/F1-score) atau teknik penyeimbangan data.
+        </div>
+        """, unsafe_allow_html=True)
 
-        st.markdown("""
-        <div class='info-box'>
-        📌 <b>Kata Negatif</b>: Kelas <b>Membantah</b> konsisten lebih tinggi → indikator pembeda kuat.<br>
-        📌 <b>Kata Positif</b>: Distribusi mirip antar kelas → bukan pembeda utama.<br>
-        📌 <b>Sentiment Score</b>: <b>Mendukung</b> cenderung lebih positif, namun overlap besar.
-        Fitur ini bersifat suplementatif.
-        </div>""", unsafe_allow_html=True)
+    # PANJANG TEKS
+    st.markdown("### 📏 Panjang Teks")
+    c1, c2 = st.columns(2, gap="large")
+    with c1:
+        fig, ax = plt.subplots(figsize=(4.5, 3.2))
+        ax.hist(df["text_length"], bins=30, color=COLOR_MAIN, alpha=0.75)
+        ax.axvline(df["text_length"].mean(), linestyle="--")
+        ax.set_title("Distribusi Panjang Teks", fontsize=10, fontweight="bold")
+        ax.spines[["top","right"]].set_visible(False)
+        st.pyplot(fig, use_container_width=True); plt.close()
+    with c2:
+        fig, ax = plt.subplots(figsize=(4.5, 3.2))
+        data_bp = [
+            df[df["stance"]=="Mendukung"]["text_length"],
+            df[df["stance"]=="Membantah"]["text_length"]
+        ]
+        ax.boxplot(data_bp)
+        ax.set_xticklabels(["Mendukung","Membantah"])
+        ax.set_title("Per Stance", fontsize=10, fontweight="bold")
+        ax.spines[["top","right"]].set_visible(False)
+        st.pyplot(fig, use_container_width=True); plt.close()
+    st.markdown("""
+    <div class='info-box'>
+    Distribusi panjang teks bersifat <b>right-skewed</b>, dengan sebagian besar dokumen 
+    berada pada rentang <b>200–600 kata</b>, serta rata-rata sekitar <b>433 kata</b>. 
+    Hal ini menunjukkan bahwa mayoritas artikel memiliki panjang moderat, namun terdapat 
+    sejumlah dokumen yang sangat panjang sebagai outlier.
+    Analisis per kelas menunjukkan bahwa teks pada kelas <b>Membantah</b> cenderung memiliki 
+    variasi panjang yang lebih besar, yang mengindikasikan bahwa argumen bantahan seringkali 
+    lebih eksploratif atau membutuhkan penjelasan lebih panjang.
+    Perbedaan distribusi ini dapat menjadi sinyal tambahan bagi model, terutama jika panjang 
+    teks berasosiasi dengan kompleksitas argumen.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # TOP KATA
+    st.markdown("### 💬 Top Kata")
+    all_w = " ".join(df["clean_text"]).split()
+    top20 = Counter(all_w).most_common(20)
+    df_top = pd.DataFrame(top20, columns=["kata","frekuensi"])
+
+    fig, ax = plt.subplots(figsize=(6, 3.5))
+    ax.barh(df_top["kata"][::-1], df_top["frekuensi"][::-1])
+    ax.set_title("Top 20 Kata", fontsize=10, fontweight="bold")
+    ax.spines[["top","right"]].set_visible(False)
+
+    st.pyplot(fig, use_container_width=True); plt.close()
+    st.markdown("""
+    <div class='info-box'>
+    Analisis frekuensi kata menunjukkan bahwa kata <b>"ahok"</b> muncul dominan pada kedua kelas, 
+    menandakan bahwa topik utama dalam dataset berpusat pada entitas tersebut.
+
+    Pada kelas <b>Membantah</b>, kata seperti <b>"yusril"</b> muncul lebih sering, yang menunjukkan 
+    adanya konteks perbandingan atau narasi kontra terhadap tokoh tertentu. Selain itu, 
+    kata-kata seperti <b>"tidak"</b> dan <b>"bukan"</b> muncul di kedua kelas, mencerminkan adanya 
+    banyak pernyataan negasi dalam teks.
+
+    Temuan ini mengindikasikan bahwa perbedaan stance tidak hanya bergantung pada kata kunci utama, 
+    tetapi juga pada konteks kalimat dan struktur argumen, sehingga pendekatan berbasis 
+    bag-of-words saja mungkin belum cukup untuk menangkap keseluruhan pola.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # SENTIMEN
+    st.markdown("### 😊 Analisis Sentimen")
+    c1, c2, c3 = st.columns(3, gap="large")
+    for col, feat, title in [
+        (c1, "pos_count", "Positif"),
+        (c2, "neg_count", "Negatif"),
+        (c3, "sentiment_score", "Score"),
+    ]:
+        with col:
+            fig, ax = plt.subplots(figsize=(3.2, 3))
+            data_bp = [
+                df[df["stance"]=="Mendukung"][feat],
+                df[df["stance"]=="Membantah"][feat]
+            ]
+            ax.boxplot(data_bp)
+            ax.set_xticklabels(["M","B"], fontsize=8)
+            ax.set_title(title, fontsize=9)
+            ax.spines[["top","right"]].set_visible(False)
+            st.pyplot(fig, use_container_width=True); plt.close()
+
+    st.markdown("""
+    <div class='info-box'>
+    Analisis sentimen menunjukkan bahwa <b>jumlah kata negatif</b> secara konsisten lebih tinggi 
+    pada kelas <b>Membantah</b>, menjadikannya sebagai indikator yang cukup kuat dalam membedakan 
+    kedua kelas.
+    Sebaliknya, distribusi <b>kata positif</b> relatif mirip antara kedua kelas, sehingga fitur ini 
+    tidak memberikan kontribusi signifikan sebagai pembeda utama.
+
+    Sementara itu, <b>sentiment_score</b> menunjukkan bahwa kelas <b>Mendukung</b> cenderung memiliki 
+    nilai yang lebih positif, namun terdapat overlap yang cukup besar antar kelas. Hal ini 
+    menunjukkan bahwa meskipun sentimen berperan, stance tidak sepenuhnya ditentukan oleh 
+    polaritas sentimen.
+
+    Dengan demikian, fitur berbasis sentimen lebih tepat digunakan sebagai <i>supporting feature</i>, 
+    bukan sebagai penentu utama dalam klasifikasi stance.
+    </div>
+    """, unsafe_allow_html=True)
 
 # TAB 6 — DATA DICTIONARY
 with tab_dict:
