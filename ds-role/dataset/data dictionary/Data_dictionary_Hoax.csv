@@ -1,9 +1,16 @@
 Nama Kolom,Tipe Data,Deskripsi,Kategori
-judul,String,Judul asli berita dari dataset hoax/fake.,Raw Data
-isi,String,Konten atau isi lengkap artikel berita.,Raw Data
-label,Integer,"Label asli berita (1: Hoax, 0: Fakta/Asli).",Raw Data
-full_text,String,"Gabungan dari kolom judul dan isi yang telah diproses (cleansing, lowercase, dan perbaikan slang).",Preprocessing
-lang,String,Kode bahasa hasil deteksi (disaring hanya untuk 'id' atau bahasa Indonesia).,Preprocessing
-label (encoded),Integer,"Representasi numerik label untuk kebutuhan model (0: Fakta, 1: Hoax).",Preprocessing
-text_len,Integer,Jumlah kata dalam kolom full_text (digunakan untuk memfilter teks antara 20 - 500 kata).,Feature Engineering
-judul_len,Integer,Jumlah kata dalam kolom judul.,Feature Engineering
+Headline,String,Judul asli berita yang diperoleh langsung dari file CSV mentah (hoax-fake.csv).,Raw Data
+Body,String,Konten atau isi lengkap artikel berita asli dari file CSV mentah.,Raw Data
+Label,Integer,Nilai target/kelas asli dari dataset mentah sebelum diubah (nilai 1 atau 0).,Raw Data
+Unnamed: 3,Float / NaN,Kolom kosong/sampah tanpa nama yang terbawa secara tidak sengaja saat membaca file CSV mentah.,Raw Data (Dropped)
+Unnamed: 4,Float / NaN,Kolom kosong/sampah tanpa nama yang terbawa secara tidak sengaja saat membaca file CSV mentah.,Raw Data (Dropped)
+Unnamed: 5,Float / NaN,Kolom kosong/sampah tanpa nama yang terbawa secara tidak sengaja saat membaca file CSV mentah.,Raw Data (Dropped)
+Unnamed: 6,Float / NaN,Kolom kosong/sampah tanpa nama yang terbawa secara tidak sengaja saat membaca file CSV mentah.,Raw Data (Dropped)
+headline,String,Kolom judul (Headline) setelah diubah menjadi huruf kecil (lowercase) dan dibersihkan dari simbol/angka/URL.,Preprocessing
+article,String,"Kolom isi berita (Body) setelah diubah menjadi huruf kecil (lowercase), diganti namanya, dan dibersihkan dari simbol/angka/URL.",Preprocessing
+label,String / Text,Kolom Label asli yang sempat diubah nilainya menjadi teks ('hoax' atau 'valid') menggunakan fungsi .map().,Preprocessing
+full_text,String,Gabungan dari kolom headline dan article yang telah dinormalisasi serta dilakukan formalisasi kata-kata slang.,Preprocessing
+lang,String,Kode bahasa hasil deteksi pustaka langdetect. Digunakan untuk memfilter teks agar hanya menyisakan kode 'id'.,Preprocessing
+label (encoded),Integer,"Representasi numerik akhir dari target menggunakan LabelEncoder untuk kebutuhan model machine learning (0: Hoax, 1: Valid).",Preprocessing / Output
+article_len,Integer,Jumlah kata (word count) yang dihitung dari kolom full_text untuk memfilter panjang artikel (antara 10 - 1000 kata).,Feature Engineering
+headline_len,Integer,Jumlah kata (word count) yang dihitung secara spesifik dari kolom teks judul (headline).,Feature Engineering
