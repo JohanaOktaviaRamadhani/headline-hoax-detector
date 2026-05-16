@@ -1,0 +1,12 @@
+Nama Kolom,Tipe Data,Deskripsi,Kategori
+headline,String,Judul asli berita yang dimuat dari dataset mentah.,Raw Data
+article,String,Isi teks lengkap artikel berita.,Raw Data
+label,String,"Kategori asli berita, yaitu ""clickbait"" atau ""non-clickbait"".",Raw Data
+source,String,Nama portal atau sumber berita (contoh: detik.com).,Raw Data
+date,String,Tanggal pemuatan atau publikasi artikel.,Raw Data
+url,String,Alamat URL lengkap sumber berita.,Raw Data
+full_text,String,"Gabungan headline dan article yang sudah melalui tahap normalisasi (huruf kecil, hapus URL, simbol) dan perbaikan kata slang.",Preprocessing
+lang,String,Hasil deteksi bahasa untuk memastikan data hanya berisi artikel bahasa Indonesia ('id').,Preprocessing
+label (encoded),Integer,"Hasil konversi label kategori menjadi angka (0: Non-Clickbait, 1: Clickbait) menggunakan LabelEncoder.",Preprocessing
+article_len,Integer,Jumlah kata yang dihitung dari kolom full_text untuk analisis distribusi.,Feature Engineering
+headline_len,Integer,Jumlah kata yang dihitung khusus dari kolom headline.,Feature Engineering

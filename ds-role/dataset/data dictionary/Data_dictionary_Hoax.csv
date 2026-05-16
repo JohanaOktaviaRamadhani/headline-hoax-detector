@@ -1,0 +1,9 @@
+Nama Kolom,Tipe Data,Deskripsi,Kategori
+judul,String,Judul asli berita dari dataset hoax/fake.,Raw Data
+isi,String,Konten atau isi lengkap artikel berita.,Raw Data
+label,Integer,"Label asli berita (1: Hoax, 0: Fakta/Asli).",Raw Data
+full_text,String,"Gabungan dari kolom judul dan isi yang telah diproses (cleansing, lowercase, dan perbaikan slang).",Preprocessing
+lang,String,Kode bahasa hasil deteksi (disaring hanya untuk 'id' atau bahasa Indonesia).,Preprocessing
+label (encoded),Integer,"Representasi numerik label untuk kebutuhan model (0: Fakta, 1: Hoax).",Preprocessing
+text_len,Integer,Jumlah kata dalam kolom full_text (digunakan untuk memfilter teks antara 20 - 500 kata).,Feature Engineering
+judul_len,Integer,Jumlah kata dalam kolom judul.,Feature Engineering

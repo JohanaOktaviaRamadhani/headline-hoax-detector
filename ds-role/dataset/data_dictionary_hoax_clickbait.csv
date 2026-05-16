@@ -1,9 +1,0 @@
-Nama Kolom,Tipe Data,Deskripsi,Kategori
-headline,String,Judul asli artikel dari dataset gabungan.,Raw Data
-article,String,Isi berita atau tubuh berita asli.,Raw Data
-label,String,"Label kategori berita asli (valid, hoax, clickbait).",Raw Data
-full_text,String,"Gabungan headline dan article yang sudah dibersihkan (cleansing, normalisasi slang, stopword removal).",Preprocessing
-article_len,Integer,Jumlah kata dalam artikel untuk filter panjang teks (10-700 kata).,Preprocessing
-headline_len,Integer,Jumlah kata dalam judul berita.,Preprocessing
-lang,String,Kode bahasa hasil deteksi (disaring untuk 'id').,Preprocessing
-label,Integer,"Representasi numerik label (0: clickbait, 1: hoax, 2: valid).",Preprocessing
