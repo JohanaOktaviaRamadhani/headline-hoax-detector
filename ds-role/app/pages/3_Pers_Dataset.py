@@ -36,10 +36,9 @@ tab_info, tab_preprocess = st.tabs([
 with tab_info:
     st.markdown("### 📋 Info Dataset")
     st.markdown("""
-    Dataset pers ini diperoleh melalui proses scraping dari situs resmi Dewan Pers 
-    dan digunakan sebagai dasar dalam membangun sumber referensi media terpercaya. 
-    Data telah melalui serangkaian tahapan preprocessing, termasuk filtering berdasarkan jenis media, 
-    seleksi atribut penting, serta pembersihan data untuk menghilangkan nilai kosong dan duplikasi.
+    Dataset pers ini dibangun menggunakan data hasil scraping dari situs resmi Dewan Pers sebagai acuan media terpercaya. 
+    Untuk menjamin kualitasnya, data telah melalui serangkaian tahap praproses (preprocessing), meliputi penyaringan (filtering) jenis media, 
+    retensi hanya pada media yang terverifikasi, seleksi atribut relevan, serta pembersihan data dari nilai kosong (missing values) dan duplikasi.
     """)
 
     col1, col2, col3 = st.columns(3)
@@ -77,21 +76,29 @@ with tab_preprocess:
     # PIPELINE STEPS
     steps = [
         ("Load Data",
-         "Menggunakan dataset hasil scraping Dewan Pers dengan total <b>2640 baris data</b>."),
+        "Menggunakan dataset hasil scraping Dewan Pers dengan total <b>2640 baris data</b>."),
+        
         ("Filter Jenis Media",
-         render_chips(["jenis_media", "=", "Siber"], "#E0F2FE", "#0369A1") +
-         "<br>Hanya mempertahankan media berbasis siber."),
+        render_chips(["jenis_media", "=", "Siber"], "#E0F2FE", "#0369A1") +
+        "<br>Hanya mempertahankan media berbasis siber."),
+        
+        ("Filter Media Terverifikasi",
+        render_chips(["status", "=", "Terverifikasi Administratif dan Faktual"], "#DCFCE7", "#15803D") +
+        "<br>Menyaring media yang telah terverifikasi secara administratif dan faktual oleh Dewan Pers."),
+        
         ("Seleksi Kolom",
-         render_chips(["nama_media", "website"], "#FEF3C7", "#92400E") +
-         "<br>Mengambil atribut utama yang relevan."),
+        render_chips(["nama_media", "website"], "#FEF3C7", "#92400E") +
+        "<br>Mengambil atribut utama yang relevan."),
+        
         ("Handling Missing Value",
-         "Menghapus <b>63 baris</b> yang memiliki nilai kosong untuk menjaga kualitas data."),
+        "Menghapus <b>58 baris</b> yang memiliki nilai kosong untuk menjaga kualitas data."),
+        
         ("Remove Duplicate",
-         "Menghapus <b>25 data duplikat</b> untuk memastikan setiap entitas unik."),
+        "Menghapus <b>0 data duplikat</b> untuk memastikan setiap entitas unik."),
+        
         ("Final Dataset",
-         "Dataset akhir berisi <b>1207 media siber</b> yang telah bersih dan siap digunakan.")
+        "Dataset akhir berisi <b>875 media siber</b> yang telah bersih dan siap digunakan.")
     ]
-
     # RENDER CARD
     for i, (title, desc) in enumerate(steps, 1):
         st.markdown(f"""

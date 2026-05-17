@@ -483,7 +483,7 @@ with tab_dict:
     """)
 
     ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    path = os.path.join(ROOT, "dataset", "Data_Dictionary_Stance.csv")
+    path = os.path.join(ROOT, "dataset", "data dictionary", "Data_Dictionary_Stance.csv")
 
     @st.cache_data
     def load_dict(p):
