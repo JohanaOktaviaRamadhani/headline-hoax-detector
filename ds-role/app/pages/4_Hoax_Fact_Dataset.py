@@ -163,7 +163,7 @@ with tab_kamus:
         filt_sw = stop_words
         
     st.markdown(
-        f"<small style='color:#6B7280; display:block; margin-bottom:8px;'>Menampilkan {min(len(filt_sw), 150)} dari {len(filt_sw)} kata ditemukan</small>",
+        f"<small style='color:#6B7280; display:block; margin-bottom:8px;'>Menampilkan {min(len(filt_sw), 200)} dari {len(filt_sw)} kata ditemukan</small>",
         unsafe_allow_html=True
     )
     if filt_sw:
@@ -349,27 +349,48 @@ with tab_eda:
 
     # 3. DUA GAMBAR TOP KATA BERDAMPINGAN
     st.markdown("### 💬 Perbandingan Kata Dominan di Tiap Label")
-    df_top_words = pd.read_csv(r"C:\Users\hanao\Downloads\headline-hoax-detector\ds-role\dataset\final\top_words_hoax_summary.csv")
 
-    unique_labels = df_top_words["label"].unique()
-    cols = st.columns(len(unique_labels))
+    top_words_data = {
+        'word': [
+            # VALID / Non-Clickbait (Urutan Frekuensi Naik)
+            'hoaks', 'mengatakan', 'kata', 'referensi', 'com', 
+            'informasi', 'pihak', 'indonesia', 'media', 'klarifikasi',
+            
+            # HOAX / Clickbait (Urutan Frekuensi Naik)
+            'akun', 'penjelasan', 'sosial', 'berita', 'indonesia', 
+            'narasi', 'foto', 'media', 'hoaks', 'sumber'
+        ],
+        'count': [
+            # Valid counts (Urutan Naik)
+            427, 429, 451, 452, 473, 
+            482, 515, 521, 648, 929,
+            
+            # Hoax counts (Urutan Naik)
+            540, 566, 578, 592, 660, 
+            667, 726, 791, 933, 981
+        ],
+        'label': ['Non-Clickbait'] * 10 + ['Clickbait'] * 10
+    }
+    df_top_words = pd.DataFrame(top_words_data)
+
+    unique_labels = ["Non-Clickbait", "Clickbait"]
+    cols = st.columns(2)
 
     for i, label_name in enumerate(unique_labels):
         with cols[i]:
             df_top = df_top_words[df_top_words["label"] == label_name]
             
-            fig, ax = plt.subplots(figsize=(5, 4))
-            bar_color = COLOR_FAKTA if label_name == "Fakta/Asli" else COLOR_HOAX
+            fig, ax = plt.subplots(figsize=(6, 4.5))
+            bar_color = COLOR_HOAX if label_name == "Non-Clickbait" else COLOR_FAKTA
             
-            # Balik urutan [::-1] agar kata dengan frekuensi tertinggi berada di paling atas grafik
-            ax.barh(df_top["word"][::-1], df_top["count"][::-1], color=bar_color)
-            
-            ax.set_title(f"Top 10 Kata - {label_name}", fontsize=12, fontweight="bold")
+            ax.barh(df_top["word"], df_top["count"], color=bar_color)
+            ax.set_title(f"Top Kata - {label_name.upper()}", fontsize=11, fontweight="bold")
             ax.set_xlabel("Frekuensi", fontsize=10)
             ax.spines[["top", "right"]].set_visible(False)
             
             st.pyplot(fig, use_container_width=True)
             plt.close(fig)            
+        
     st.markdown("""
     <div class='info-box'>
     Analisis frekuensi kata pada data valid menunjukkan bahwa kata <b>"klarifikasi"</b> muncul secara dominan jauh melampaui kata-kata lainnya. Hal ini menandakan bahwa korpus data ini sangat berpusat pada narasi pelurusan informasi atau pernyataan resmi.
