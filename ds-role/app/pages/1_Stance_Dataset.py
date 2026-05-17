@@ -300,31 +300,7 @@ with tab_feat:
             <div style='font-size:0.85rem;color:#6B7280;margin-bottom:2px'>{desc}</div>
             <div style='font-size:0.82rem;color:#9CA3AF'>{explain}</div>
         </div>
-        """, unsafe_allow_html=True)
-
-    # st.markdown("#### Correlation Matrix")
-    # st.markdown("""
-    # Matriks korelasi menunjukkan hubungan antar fitur numerik. 
-    # Nilai mendekati 1 berarti hubungan positif kuat, mendekati -1 berarti negatif kuat, 
-    # dan mendekati 0 berarti tidak ada hubungan linear yang signifikan.
-    # """)
-
-    # cols = ["text_length", "pos_count", "neg_count", "sentiment_score", "label"]
-    # corr = df[cols].corr()
-    # fig, ax = plt.subplots(figsize=(4, 3), dpi=120)  
-    # sns.heatmap(
-    #     corr,
-    #     annot=True,
-    #     fmt=".1f",  
-    #     cmap="coolwarm",
-    #     annot_kws={"size":7},
-    #     cbar=False,
-    #     square=True, 
-    #     ax=ax
-    # )
-    # ax.tick_params(labelsize=7)
-    # plt.tight_layout()  
-    # st.pyplot(fig, use_container_width=False)  
+        """, unsafe_allow_html=True) 
 
 # TAB 5 — EDA
 with tab_eda:
@@ -405,18 +381,34 @@ with tab_eda:
     </div>
     """, unsafe_allow_html=True)
 
-    # TOP KATA
-    st.markdown("### 💬 Top Kata")
-    all_w = " ".join(df["clean_text"]).split()
-    top20 = Counter(all_w).most_common(20)
-    df_top = pd.DataFrame(top20, columns=["kata","frekuensi"])
+    # TOP KATA PER LABEL
+    st.markdown("### 💬 Top Kata Berdasarkan Stance")
 
-    fig, ax = plt.subplots(figsize=(6, 3.5))
-    ax.barh(df_top["kata"][::-1], df_top["frekuensi"][::-1])
-    ax.set_title("Top 20 Kata", fontsize=10, fontweight="bold")
-    ax.spines[["top","right"]].set_visible(False)
+    # Fungsi untuk mengambil top words
+    def get_top_words(text_series, n=10):
+        words = " ".join(text_series.dropna().astype(str)).split()
+        return Counter(words).most_common(n)
 
-    st.pyplot(fig, use_container_width=True); plt.close()
+    # Ambil label unik dari kolom stance
+    unique_stances = df["stance"].unique()
+    cols = st.columns(len(unique_stances))
+
+    for i, stance in enumerate(unique_stances):
+        with cols[i]:
+            # Filter data berdasarkan stance
+            subset = df[df["stance"] == stance]["clean_text"]
+            top_words = get_top_words(subset, 10)
+            df_top = pd.DataFrame(top_words, columns=["kata", "frekuensi"])
+            
+            fig, ax = plt.subplots(figsize=(5, 4))
+            ax.barh(df_top["kata"][::-1], df_top["frekuensi"][::-1], color="#1f77b4")
+            
+            ax.set_title(f"Top 10 Kata - {stance}", fontsize=12, fontweight="bold")
+            ax.set_xlabel("Frekuensi", fontsize=10)
+            ax.spines[["top", "right"]].set_visible(False)
+            
+            st.pyplot(fig, use_container_width=True)
+            plt.close(fig)
     st.markdown("""
     <div class='info-box'>
     Analisis frekuensi kata menunjukkan bahwa kata <b>"ahok"</b> muncul dominan pada kedua kelas, 
@@ -448,7 +440,7 @@ with tab_eda:
                 df[df["stance"]=="Membantah"][feat]
             ]
             ax.boxplot(data_bp)
-            ax.set_xticklabels(["M","B"], fontsize=8)
+            ax.set_xticklabels(["Mendukung","Bantah"], fontsize=8)
             ax.set_title(title, fontsize=9)
             ax.spines[["top","right"]].set_visible(False)
             st.pyplot(fig, use_container_width=True); plt.close()

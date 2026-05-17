@@ -97,7 +97,7 @@ with tab_preprocess:
         "Menghapus <b>0 data duplikat</b> untuk memastikan setiap entitas unik."),
         
         ("Final Dataset",
-        "Dataset akhir berisi <b>875 media siber</b> yang telah bersih dan siap digunakan.")
+        "Dataset akhir berisi <b>875 media siber terverifikasi</b> yang telah bersih dan siap digunakan.")
     ]
     # RENDER CARD
     for i, (title, desc) in enumerate(steps, 1):
