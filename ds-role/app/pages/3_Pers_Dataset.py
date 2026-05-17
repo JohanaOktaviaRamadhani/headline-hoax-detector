@@ -34,7 +34,7 @@ tab_info, tab_preprocess = st.tabs([
 
 # TAB 1 — INFO DATASET
 with tab_info:
-    st.markdown("### 📋 Info Dataset")
+    st.markdown("### Info Dataset")
     st.markdown("""
     Dataset pers ini dibangun menggunakan data hasil scraping dari situs resmi Dewan Pers sebagai acuan media terpercaya. 
     Untuk menjamin kualitasnya, data telah melalui serangkaian tahap praproses (preprocessing), meliputi penyaringan (filtering) jenis media, 
@@ -59,7 +59,7 @@ with tab_info:
 
 # TAB 2 — PREPROCESSING
 with tab_preprocess:
-    st.markdown("### ⚙️ Pipeline Preprocessing Dataset Pers")
+    st.markdown("### Pipeline Preprocessing Dataset Pers")
     st.markdown("""
     Pipeline preprocessing dilakukan untuk menyaring dan membersihkan data hasil scraping 
     sehingga hanya menyisakan entitas media yang relevan dan valid. 
