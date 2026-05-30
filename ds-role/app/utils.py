@@ -1,14 +1,17 @@
 SHARED_CSS = """
 <style>
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-.main { background-color: #FAFAFA; }
+.main { background-color: var(--background-color); }
 section[data-testid="stSidebar"] {
-    background-color: #FFFFFF;
-    border-right: 1px solid #E5E7EB;
+    background-color: var(--secondary-background-color);
+    border-right: 1px solid rgba(128, 128, 128, 0.22);
+}
+section[data-testid="stSidebar"] * {
+    color: var(--text-color);
 }
 div[data-testid="metric-container"] {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    background: var(--secondary-background-color);
+    border: 1px solid rgba(128, 128, 128, 0.22);
     border-radius: 12px;
     padding: 16px 20px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.04);
@@ -84,3 +87,28 @@ COLOR_MAIN       = "#6366F1"
 COLOR_MENDUKUNG  = "#10B981"
 COLOR_MEMBANTAH  = "#F43F5E"
 COLOR_NEUTRAL    = "#94A3B8"
+
+def get_chart_text_color():
+    try:
+        import streamlit as st
+
+        active_theme = getattr(st.context, "theme", {}) or {}
+        active_theme_type = active_theme.get("type") or active_theme.get("base")
+        if active_theme_type == "dark":
+            return "#FAFAFA"
+        if active_theme_type == "light":
+            return "#111827"
+
+        theme_base = st.get_option("theme.base")
+        if theme_base == "dark":
+            return "#FAFAFA"
+        if theme_base == "light":
+            return "#111827"
+
+        text_color = st.get_option("theme.textColor")
+        if text_color:
+            return text_color
+    except Exception:
+        pass
+
+    return "#111827"

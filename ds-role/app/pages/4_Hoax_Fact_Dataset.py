@@ -10,7 +10,7 @@ APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
 sys.path.append(APP)
-from utils import SHARED_CSS, COLOR_MAIN  
+from utils import SHARED_CSS, COLOR_MAIN, get_chart_text_color
 
 COLOR_FAKTA = "#10B981" 
 COLOR_HOAX  = "#EF4444"  
@@ -115,6 +115,7 @@ with tab_info:
         st.markdown("**Distribusi Kelas Berita**")
         fakta_cnt = len(df[df["label_text"] == "Fakta/Asli"])
         hoax_cnt = len(df[df["label_text"] == "Hoaks/Fake"])
+        chart_text_color = get_chart_text_color()
         
         fig, ax = plt.subplots(figsize=(3, 3))
         wedges, _ = ax.pie(
@@ -124,8 +125,10 @@ with tab_info:
             radius=0.85,
             wedgeprops=dict(width=0.35, edgecolor="white")
         )
-        ax.text(0, 0, f"{total_rows}", ha="center", va="center", fontsize=12, fontweight="bold")
-        ax.legend(wedges, [f"Fakta ({fakta_cnt})", f"Hoaks ({hoax_cnt})"], loc="center left", bbox_to_anchor=(1, 0.5), frameon=False, fontsize=9)
+        ax.text(0, 0, f"{total_rows}", ha="center", va="center", fontsize=12, fontweight="bold", color=chart_text_color)
+        legend = ax.legend(wedges, [f"Fakta ({fakta_cnt})", f"Hoaks ({hoax_cnt})"], loc="center left", bbox_to_anchor=(1, 0.5), frameon=False, fontsize=9)
+        for text in legend.get_texts():
+            text.set_color(chart_text_color)
         fig.patch.set_facecolor("none")
         st.pyplot(fig, use_container_width=False)
         plt.close()

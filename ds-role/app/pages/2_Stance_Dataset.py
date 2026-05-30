@@ -11,7 +11,7 @@ APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
 sys.path.append(APP)
-from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH
+from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH, get_chart_text_color
 
 st.set_page_config(page_title="Stance Dataset · Hoax Detector", page_icon="🗣️", layout="wide")
 st.markdown(SHARED_CSS, unsafe_allow_html=True)
@@ -113,6 +113,7 @@ with tab_info:
 
         sizes = [mendukung, membantah]
         colors = [COLOR_MENDUKUNG, COLOR_MEMBANTAH]
+        chart_text_color = get_chart_text_color()
 
         fig, ax = plt.subplots(figsize=(3, 3))  
         wedges, _ = ax.pie(
@@ -128,9 +129,10 @@ with tab_info:
             ha="center",
             va="center",
             fontsize=12,
-            fontweight="bold"
+            fontweight="bold",
+            color=chart_text_color
         )
-        ax.legend(
+        legend = ax.legend(
             wedges,
             [
                 f"Mendukung ({mendukung})",
@@ -141,6 +143,8 @@ with tab_info:
             frameon=False,
             fontsize=9
         )
+        for text in legend.get_texts():
+            text.set_color(chart_text_color)
         ax.set(aspect="equal")
         fig.patch.set_facecolor("none")
         st.pyplot(fig, use_container_width=False) 
