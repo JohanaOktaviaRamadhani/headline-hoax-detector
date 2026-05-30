@@ -11,7 +11,7 @@ APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
 sys.path.append(APP)
-from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH, get_chart_text_color
+from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH, get_chart_text_color, left_aligned_dataframe
 
 st.set_page_config(page_title="Stance Dataset · Hoax Detector", page_icon="🗣️", layout="wide")
 st.markdown(SHARED_CSS, unsafe_allow_html=True)
@@ -175,7 +175,7 @@ with tab_info:
         lambda x: x[:55] + "..." if len(x) > 55 else x
     )
 
-    st.dataframe(preview, use_container_width=True, hide_index=True)
+    left_aligned_dataframe(preview, use_container_width=True, hide_index=True)
 
 # TAB 2 — KAMUS KATA
 with tab_kamus:
@@ -487,7 +487,7 @@ with tab_dict:
 
     try:
         df_dict = load_dict(path)
-        st.dataframe(df_dict, use_container_width=True, hide_index=True)
+        left_aligned_dataframe(df_dict, use_container_width=True, hide_index=True)
     except FileNotFoundError:
         st.error("❌ File Data_Dictionary_Stance.csv tidak ditemukan di folder dataset.")
         st.write("Path yang dicoba:", path)

@@ -1,14 +1,21 @@
 import streamlit as st
 import pandas as pd
 import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+APP = os.path.join(ROOT, "app")
+sys.path.append(APP)
+from utils import SHARED_CSS, left_aligned_dataframe
 
 # CONFIG
 st.set_page_config(page_title="Pers Dataset", page_icon="🏛️", layout="wide")
 st.title("🏛️ Pers Dataset")
 
+st.markdown(SHARED_CSS, unsafe_allow_html=True)
+
 # PATH
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(os.path.dirname(BASE_DIR))
 DATA_DIR = os.path.join(ROOT, "dataset")
 
 # LOAD DATA
@@ -55,7 +62,7 @@ with tab_info:
 
     st.markdown("#### Contoh Data Final")
     preview = df_final.head(10)
-    st.dataframe(preview, use_container_width=True, hide_index=True)
+    left_aligned_dataframe(preview, use_container_width=True, hide_index=True)
 
 # TAB 2 — PREPROCESSING
 with tab_preprocess:

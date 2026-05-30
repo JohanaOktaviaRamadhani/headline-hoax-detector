@@ -80,6 +80,25 @@ div[data-testid="metric-container"] {
     color: #1F2937;
     margin-bottom: 6px;
 }
+
+div[data-testid="stDataFrame"] [role="columnheader"],
+div[data-testid="stDataFrame"] [role="gridcell"],
+div[data-testid="stDataFrame"] [data-testid="stDataFrameCell"] {
+    justify-content: flex-start !important;
+    text-align: left !important;
+}
+
+div[data-testid="stDataFrame"] [role="columnheader"] *,
+div[data-testid="stDataFrame"] [role="gridcell"] *,
+div[data-testid="stDataFrame"] [data-testid="stDataFrameCell"] * {
+    text-align: left !important;
+}
+
+div[data-testid="stTable"] table,
+div[data-testid="stTable"] th,
+div[data-testid="stTable"] td {
+    text-align: left !important;
+}
 </style>
 """
 
@@ -87,6 +106,21 @@ COLOR_MAIN       = "#6366F1"
 COLOR_MENDUKUNG  = "#10B981"
 COLOR_MEMBANTAH  = "#F43F5E"
 COLOR_NEUTRAL    = "#94A3B8"
+
+def left_aligned_dataframe(data, **kwargs):
+    import streamlit as st
+
+    styles = [
+        {"selector": "th", "props": [("text-align", "left")]},
+        {"selector": "td", "props": [("text-align", "left")]},
+    ]
+
+    try:
+        styled_data = data.style.set_properties(**{"text-align": "left"}).set_table_styles(styles)
+    except AttributeError:
+        styled_data = data
+
+    st.dataframe(styled_data, **kwargs)
 
 def get_chart_text_color():
     try:

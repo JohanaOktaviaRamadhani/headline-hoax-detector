@@ -10,7 +10,7 @@ APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
 sys.path.append(APP)
-from utils import SHARED_CSS, COLOR_MAIN, get_chart_text_color
+from utils import SHARED_CSS, COLOR_MAIN, get_chart_text_color, left_aligned_dataframe
 
 COLOR_NON_CLICKBAIT = "#10B981" # Hijau untuk Non-Clickbait (Valid)
 COLOR_CLICKBAIT     = "#EF4444" # Merah untuk Clickbait
@@ -147,7 +147,7 @@ with tab_info:
     st.markdown("**Preview Berita Terproses**")
     preview = df[["clean_text", "label_text"]].head(5).copy()
     preview["clean_text"] = preview["clean_text"].apply(lambda x: str(x)[:70] + "..." if len(str(x)) > 70 else str(x))
-    st.dataframe(preview, use_container_width=True, hide_index=True)
+    left_aligned_dataframe(preview, use_container_width=True, hide_index=True)
 
 
 # 🛠️ TAB 2 — KAMUS KATA (Stopwords)
@@ -418,7 +418,7 @@ with tab_dict:
 
     try:
         df_dict = load_dict(path)
-        st.dataframe(df_dict, use_container_width=True, hide_index=True)
+        left_aligned_dataframe(df_dict, use_container_width=True, hide_index=True)
     except FileNotFoundError:
         st.error("❌ File Data_Dictionary_clickbait.csv tidak ditemukan di folder dataset.")
         st.write("Path yang dicoba:", path)
