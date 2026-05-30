@@ -1,0 +1,10 @@
+Metric,Value
+Sample Size,500.0
+Control Avg Latency (ms),0.19312099763192236
+Variant Avg Latency (ms),0.24735180125571787
+Control Compression Pct,0.0
+Variant Compression Pct,32.14867949135963
+T-Stat Latency,-5.014120148677417
+P-Val Latency,6.566474218116524e-07
+T-Stat Compression,39.7099431955984
+P-Val Compression,1.4003857541657977e-156
