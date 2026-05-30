@@ -9,8 +9,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
-sys.path.append(APP)
-from utils import SHARED_CSS, COLOR_MAIN, get_chart_text_color, left_aligned_dataframe
+sys.path.insert(0, APP)
+from utils import SHARED_CSS, COLOR_MAIN, get_chart_text_color
+
+def left_aligned_dataframe(data, **kwargs):
+    styles = [
+        {"selector": "th", "props": [("text-align", "left")]},
+        {"selector": "td", "props": [("text-align", "left")]},
+    ]
+    styled_data = data.style.set_properties(**{"text-align": "left"}).set_table_styles(styles)
+    st.dataframe(styled_data, **kwargs)
 
 COLOR_FAKTA = "#10B981" 
 COLOR_HOAX  = "#EF4444"  

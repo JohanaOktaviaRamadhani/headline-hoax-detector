@@ -10,8 +10,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 APP  = os.path.join(ROOT, "app")
 DATA = os.path.join(ROOT, "dataset")
 
-sys.path.append(APP)
-from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH, get_chart_text_color, left_aligned_dataframe
+sys.path.insert(0, APP)
+from utils import SHARED_CSS, COLOR_MAIN, COLOR_MENDUKUNG, COLOR_MEMBANTAH, get_chart_text_color
+
+def left_aligned_dataframe(data, **kwargs):
+    styles = [
+        {"selector": "th", "props": [("text-align", "left")]},
+        {"selector": "td", "props": [("text-align", "left")]},
+    ]
+    styled_data = data.style.set_properties(**{"text-align": "left"}).set_table_styles(styles)
+    st.dataframe(styled_data, **kwargs)
 
 st.set_page_config(page_title="Stance Dataset · Hoax Detector", page_icon="🗣️", layout="wide")
 st.markdown(SHARED_CSS, unsafe_allow_html=True)

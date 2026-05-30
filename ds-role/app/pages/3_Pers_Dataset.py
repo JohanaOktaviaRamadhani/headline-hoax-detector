@@ -5,8 +5,16 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 APP = os.path.join(ROOT, "app")
-sys.path.append(APP)
-from utils import SHARED_CSS, left_aligned_dataframe
+sys.path.insert(0, APP)
+from utils import SHARED_CSS
+
+def left_aligned_dataframe(data, **kwargs):
+    styles = [
+        {"selector": "th", "props": [("text-align", "left")]},
+        {"selector": "td", "props": [("text-align", "left")]},
+    ]
+    styled_data = data.style.set_properties(**{"text-align": "left"}).set_table_styles(styles)
+    st.dataframe(styled_data, **kwargs)
 
 # CONFIG
 st.set_page_config(page_title="Pers Dataset", page_icon="🏛️", layout="wide")
