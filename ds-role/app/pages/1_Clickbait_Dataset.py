@@ -418,7 +418,7 @@ with tab_dict:
     """)
     
     ROOT = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    path = os.path.join(ROOT, "dataset", "data dictionary", "Data_Dictionary_clickbait.csv")
+    path = os.path.join(ROOT, "dataset", "data dictionary", "Data_dictionary_clickbait.csv")
 
     @st.cache_data
     def load_dict(p):
@@ -428,5 +428,5 @@ with tab_dict:
         df_dict = load_dict(path)
         left_aligned_dataframe(df_dict, use_container_width=True, hide_index=True)
     except FileNotFoundError:
-        st.error("❌ File Data_Dictionary_clickbait.csv tidak ditemukan di folder dataset.")
+        st.error("❌ File Data_dictionary_clickbait.csv tidak ditemukan di folder dataset.")
         st.write("Path yang dicoba:", path)
